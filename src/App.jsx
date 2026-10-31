@@ -33,22 +33,6 @@ export default function App() {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isFirstTimeTutorial, setIsFirstTimeTutorial] = useState(false);
 
-  // Check first-time visitor experience for tutorial modal
-  useEffect(() => {
-    try {
-      const tutorialSeen = localStorage.getItem('save_the_ball_tutorial_seen');
-      if (!tutorialSeen) {
-        const timer = setTimeout(() => {
-          setIsTutorialOpen(true);
-          setIsFirstTimeTutorial(true);
-        }, 300);
-        return () => clearTimeout(timer);
-      }
-    } catch (e) {
-      console.warn('LocalStorage unavailable for tutorial state', e);
-    }
-  }, []);
-
   // Sync title and metadata on page change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
