@@ -338,41 +338,57 @@ export default function GameView({ onNavigate, onOpenTutorial }) {
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-4 px-2 sm:px-4 select-none">
-      {/* Level Header Info */}
-      <div className="w-full max-w-4xl flex items-center justify-between bg-slate-900/80 border border-slate-800 rounded-2xl px-4 py-2.5 mb-3 shadow-lg">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              sound.playClick();
-              setShowLevelSelect(true);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition border border-slate-700"
-          >
-            <Grid className="w-4 h-4 text-emerald-400" />
-            <span>LVL {currentLevel.id}</span>
-          </button>
+      {/* Level Header Info & Controls (Fully Responsive on Mobile) */}
+      <div className="w-full max-w-4xl bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 sm:px-4 sm:py-2.5 mb-2.5 shadow-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+        {/* Left: Level Badge & Title */}
+        <div className="flex items-center justify-between sm:justify-start gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <button
+              onClick={() => {
+                sound.playClick();
+                setShowLevelSelect(true);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-xs font-bold text-slate-200 transition border border-slate-700 shrink-0"
+            >
+              <Grid className="w-4 h-4 text-emerald-400" />
+              <span>LVL {currentLevel.id}</span>
+            </button>
 
-          <div>
-            <h2 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-1.5 font-heading">
-              {currentLevel.title}
-              {currentLevel.isDaily && (
-                <span className="text-[10px] bg-orange-500/20 text-orange-400 border border-orange-500/40 px-2 py-0.5 rounded-full font-sans">
-                  DAILY
-                </span>
-              )}
-            </h2>
-            <div className="text-[11px] text-slate-400 font-medium hidden sm:block">
-              {currentLevel.worldName} &bull; 3-Star Target: {currentLevel.threeStarInk} px ink
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-1.5 font-heading truncate">
+                <span className="truncate">{currentLevel.title}</span>
+                {currentLevel.isDaily && (
+                  <span className="text-[9px] bg-orange-500/20 text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full font-sans shrink-0">
+                    DAILY
+                  </span>
+                )}
+              </h2>
+              <div className="text-[10px] text-slate-400 font-medium hidden md:block">
+                {currentLevel.worldName} &bull; 3-Star Target: {currentLevel.threeStarInk} px ink
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Quick Toolbar */}
-        <div className="flex items-center gap-1.5">
+          {/* Release Ball button on mobile header row if not released */}
           {!isBallReleased && (
             <button
               onClick={handleReleaseBall}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/30 transition transform hover:scale-105 animate-pulse mr-1"
+              className="sm:hidden flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/30 active:scale-95 transition shrink-0"
+              title="Release Ball"
+            >
+              <Play className="w-3.5 h-3.5 fill-slate-950" />
+              <span>Roll 🚀</span>
+            </button>
+          )}
+        </div>
+
+        {/* Right: Action Toolbar */}
+        <div className="flex items-center justify-end gap-1 sm:gap-1.5">
+          {/* Release Ball button on desktop */}
+          {!isBallReleased && (
+            <button
+              onClick={handleReleaseBall}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/30 transition transform hover:scale-105 active:scale-95 animate-pulse mr-1"
               title="Release Ball (Space)"
             >
               <Play className="w-3.5 h-3.5 fill-slate-950" />
@@ -380,7 +396,7 @@ export default function GameView({ onNavigate, onOpenTutorial }) {
             </button>
           )}
 
-          {/* Tutorial Video Quick Replay */}
+          {/* Tutorial Video Quick Button */}
           <button
             onClick={() => {
               if (onOpenTutorial) {
@@ -388,44 +404,48 @@ export default function GameView({ onNavigate, onOpenTutorial }) {
                 onOpenTutorial();
               }
             }}
-            className="p-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition flex items-center gap-1"
+            className="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition flex items-center gap-1 active:scale-95"
             title="Watch 15s Tutorial Video"
           >
             <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-[11px] font-bold hidden sm:inline">Tutorial</span>
+            <span className="text-[11px] font-bold hidden md:inline">Tutorial</span>
           </button>
 
+          {/* Hint Toggle */}
           <button
             onClick={() => setHintVisible(prev => !prev)}
-            className={`p-2 rounded-xl transition ${
+            className={`p-2 rounded-xl transition active:scale-95 ${
               hintVisible ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400 hover:text-white'
             }`}
-            title="Hint"
+            title="Level Hint"
           >
             <HelpCircle className="w-4 h-4" />
           </button>
 
+          {/* Restart Button */}
           <button
             onClick={handleRestart}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
-            title="Restart (R)"
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition active:scale-95"
+            title="Restart Level (R)"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
 
+          {/* Pause Button */}
           <button
             onClick={() => setIsPaused(prev => !prev)}
-            className={`p-2 rounded-xl transition ${
+            className={`p-2 rounded-xl transition active:scale-95 ${
               isPaused ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:text-white'
             }`}
-            title="Pause (Space)"
+            title="Pause Game (Space)"
           >
             {isPaused ? <Play className="w-4 h-4 fill-slate-950" /> : <Pause className="w-4 h-4" />}
           </button>
 
+          {/* Settings Button */}
           <button
             onClick={() => setShowSettings(true)}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition active:scale-95"
             title="Settings"
           >
             <Settings className="w-4 h-4" />

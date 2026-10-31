@@ -40,11 +40,11 @@ export default function SettingsModal({ isOpen, onClose, onSettingsChange }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border border-slate-700/80 rounded-3xl p-6 shadow-2xl text-white flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border border-slate-700/80 rounded-3xl p-4 sm:p-6 shadow-2xl text-white flex flex-col max-h-[92vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-700/80 mb-4">
-          <h2 className="text-2xl font-bold font-heading text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-teal-300">
+        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-700/80 mb-4 shrink-0">
+          <h2 className="text-xl sm:text-2xl font-bold font-heading text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-teal-300">
             Audio & Settings
           </h2>
           <button
