@@ -225,5 +225,14 @@ The application includes compliant, reusable advertisement slots placed strictly
 
 ---
 
+## 👨‍💻 Creator & Developer
+
+**Created by Shubham mishra techworld**
+- 📧 **Email**: [systemm7878@gmail.com](mailto:systemm7878@gmail.com)
+- 💼 **LinkedIn**: [Shubham Mishra](https://www.linkedin.com/in/shubham-mishra-36b468326/)
+
+---
+
 ## 📄 License
 This project is open-source and available under the **MIT License**.
+

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Gamepad2, Compass, Shield, Heart, ArrowRight } from 'lucide-react';
+import { Sparkles, Gamepad2, Compass, Shield, Heart, ArrowRight, Mail, Linkedin } from 'lucide-react';
 
 export default function Footer({ onNavigate, onOpenLevels, onOpenDaily, onOpenTutorial }) {
   const currentYear = new Date().getFullYear();
@@ -241,15 +241,41 @@ export default function Footer({ onNavigate, onOpenLevels, onOpenDaily, onOpenTu
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright, Credits & Compatibility */}
-        <div className="border-t border-slate-800/80 py-6 flex flex-col sm:flex-row items-center justify-between text-slate-400 text-xs gap-3 text-center sm:text-left">
-          <div className="flex flex-col sm:flex-row items-center gap-2">
-            <span>&copy; {currentYear} SAVE THE BALL! Online. All rights reserved.</span>
-            <span className="hidden sm:inline text-slate-600">&bull;</span>
-            <span className="text-cyan-400 font-semibold">Created by Shubham mishra techworld</span>
+        {/* Bottom Bar: Copyright, Creator Connect & Compatibility */}
+        <div className="border-t border-slate-800/80 pt-6 pb-8 flex flex-col items-center justify-between gap-4 text-xs">
+          <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-3 text-center lg:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-2 text-slate-400">
+              <span>&copy; {currentYear} SAVE THE BALL! Online. All rights reserved.</span>
+              <span className="hidden sm:inline text-slate-600">&bull;</span>
+              <span className="text-cyan-400 font-semibold">Created by Shubham mishra techworld</span>
+            </div>
+
+            {/* Direct Connect: Email & LinkedIn */}
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              <a
+                href="mailto:systemm7878@gmail.com"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 hover:border-emerald-500/60 text-slate-300 hover:text-emerald-300 text-xs font-medium transition shadow-sm group"
+                title="Email Shubham Mishra"
+              >
+                <Mail className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                <span className="font-mono text-[11px] sm:text-xs">systemm7878@gmail.com</span>
+              </a>
+
+              <a
+                href="https://www.linkedin.com/in/shubham-mishra-36b468326/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-950/40 border border-blue-800/60 hover:border-blue-400 text-blue-300 hover:text-white text-xs font-medium transition shadow-sm group"
+                title="LinkedIn Profile"
+              >
+                <Linkedin className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+                <span>LinkedIn</span>
+              </a>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-slate-400 text-[11px]">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-slate-500 text-[11px]">
+            <span>Cross-Platform:</span>
             <span>Chrome</span>
             <span>&bull;</span>
             <span>Firefox</span>

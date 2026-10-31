@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AdBanner from '../components/AdSense/AdBanner';
-import { Mail, MessageSquare, Send, CheckCircle2 } from 'lucide-react';
+import { Mail, MessageSquare, Send, CheckCircle2, Linkedin } from 'lucide-react';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', category: 'feedback', message: '' });
@@ -31,6 +31,26 @@ export default function Contact() {
         <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
           Have an idea for a creative new level, found a physics bug, or interested in partnership? We&rsquo;d love to hear from you!
         </p>
+
+        {/* Direct Contact Cards */}
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a
+            href="mailto:systemm7878@gmail.com"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500/50 text-slate-200 text-xs font-medium transition group shadow-sm"
+          >
+            <Mail className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+            <span>systemm7878@gmail.com</span>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/shubham-mishra-36b468326/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-950/40 hover:bg-blue-950/60 border border-blue-800/60 hover:border-blue-400 text-blue-200 text-xs font-medium transition group shadow-sm"
+          >
+            <Linkedin className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+            <span>Connect on LinkedIn</span>
+          </a>
+        </div>
       </div>
 
       <AdBanner slot="5566778899" format="horizontal" />

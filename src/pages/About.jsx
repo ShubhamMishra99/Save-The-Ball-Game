@@ -1,6 +1,6 @@
 import React from 'react';
 import AdBanner from '../components/AdSense/AdBanner';
-import { Heart, ShieldCheck, Cpu, Sparkles } from 'lucide-react';
+import { Heart, ShieldCheck, Cpu, Sparkles, Mail, Linkedin } from 'lucide-react';
 
 export default function About({ onPlayNow }) {
   return (
@@ -54,6 +54,24 @@ export default function About({ onPlayNow }) {
           <p>
             Created with passion by <strong className="text-cyan-400 font-bold">Shubham mishra techworld</strong>. Dedicated to building engaging, high-performance web applications and creative games.
           </p>
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <a
+              href="mailto:systemm7878@gmail.com"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-emerald-500/60 text-slate-300 hover:text-emerald-300 text-xs font-medium transition shadow-sm group"
+            >
+              <Mail className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span>systemm7878@gmail.com</span>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/shubham-mishra-36b468326/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-950/40 border border-blue-800/60 hover:border-blue-400 text-blue-300 hover:text-white text-xs font-medium transition shadow-sm group"
+            >
+              <Linkedin className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+              <span>LinkedIn Profile</span>
+            </a>
+          </div>
         </div>
       </div>
 
