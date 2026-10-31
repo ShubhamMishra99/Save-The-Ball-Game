@@ -46,6 +46,15 @@ export default function About({ onPlayNow }) {
             <li>Local-first persistence via Web Storage API with zero invasive tracking.</li>
           </ul>
         </div>
+
+        <div className="p-6 rounded-3xl bg-slate-800/60 border border-slate-700/80 space-y-3">
+          <h2 className="text-xl font-bold text-white font-heading flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-400" /> Creator & Developer
+          </h2>
+          <p>
+            Created with passion by <strong className="text-cyan-400 font-bold">Shubham mishra techworld</strong>. Dedicated to building engaging, high-performance web applications and creative games.
+          </p>
+        </div>
       </div>
 
       <div className="text-center pt-6">

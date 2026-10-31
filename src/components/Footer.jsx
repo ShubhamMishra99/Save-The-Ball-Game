@@ -241,13 +241,15 @@ export default function Footer({ onNavigate, onOpenLevels, onOpenDaily, onOpenTu
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & Compatibility */}
-        <div className="border-t border-slate-800/80 py-6 flex flex-col sm:flex-row items-center justify-between text-slate-500 text-[11px] gap-3 text-center sm:text-left">
-          <div className="flex items-center gap-2">
+        {/* Bottom Bar: Copyright, Credits & Compatibility */}
+        <div className="border-t border-slate-800/80 py-6 flex flex-col sm:flex-row items-center justify-between text-slate-400 text-xs gap-3 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-2">
             <span>&copy; {currentYear} SAVE THE BALL! Online. All rights reserved.</span>
+            <span className="hidden sm:inline text-slate-600">&bull;</span>
+            <span className="text-cyan-400 font-semibold">Created by Shubham mishra techworld</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-slate-400 text-[11px]">
             <span>Chrome</span>
             <span>&bull;</span>
             <span>Firefox</span>
