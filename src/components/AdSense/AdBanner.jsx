@@ -10,7 +10,7 @@ export default function AdBanner({
   responsive = true,
   className = '',
   style = {},
-  client = 'ca-pub-XXXXXXXXXXXXXXXX' // Replace with your approved AdSense Publisher ID
+  client = 'ca-pub-1079976856424725'
 }) {
   const adRef = useRef(null);
   const isConfigured = client && client.startsWith('ca-pub-') && client !== 'ca-pub-XXXXXXXXXXXXXXXX';
