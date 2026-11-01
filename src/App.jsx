@@ -67,6 +67,13 @@ export default function App() {
     }
   }, [currentPage]);
 
+  // Manage background music when navigating away from the game view
+  useEffect(() => {
+    if (currentPage !== 'game') {
+      sound.stopMusic();
+    }
+  }, [currentPage]);
+
   const handleNavigate = (page) => {
     sound.playClick();
     setCurrentPage(page);

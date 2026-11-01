@@ -1,11 +1,15 @@
 // Web Audio API procedural sound effects & background music synthesizer
 // 100% original, self-contained, no external audio files required!
 
+import storage from './storage';
+
 class SoundSystem {
   constructor() {
     this.ctx = null;
-    this.soundEnabled = true;
-    this.musicEnabled = true;
+    const storedSound = typeof window !== 'undefined' ? storage.get('soundEnabled') : true;
+    const storedMusic = typeof window !== 'undefined' ? storage.get('musicEnabled') : true;
+    this.soundEnabled = storedSound ?? true;
+    this.musicEnabled = storedMusic ?? true;
     this.volume = 0.7;
     this.musicPlaying = false;
     this.musicTimer = null;
@@ -29,7 +33,7 @@ class SoundSystem {
   ensureContext() {
     if (!this.ctx) this.init();
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
   }
 
@@ -298,6 +302,15 @@ class SoundSystem {
     if (!this.musicEnabled || this.musicPlaying) return;
     this.ensureContext();
     if (!this.ctx) return;
+
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().then(() => {
+        if (this.musicEnabled && !this.musicPlaying) {
+          this.startMusic();
+        }
+      }).catch(() => {});
+      return;
+    }
 
     this.musicPlaying = true;
     const tempo = 124;

@@ -92,7 +92,11 @@ export default function GameView({ onNavigate, onOpenTutorial }) {
       max: lvl.inkLimit || 600,
       remaining: lvl.inkLimit || 600
     });
-  }, []);
+
+    if (!isPaused && (storage.get('musicEnabled') ?? true)) {
+      sound.startMusic();
+    }
+  }, [isPaused]);
 
   // Initialize Canvas, Physics, Drawing, and Renderer
   useEffect(() => {
@@ -222,6 +226,7 @@ export default function GameView({ onNavigate, onOpenTutorial }) {
     const handleVisibility = () => {
       if (document.hidden) {
         setIsPaused(true);
+        sound.stopMusic();
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
@@ -231,8 +236,48 @@ export default function GameView({ onNavigate, onOpenTutorial }) {
       document.removeEventListener('visibilitychange', handleVisibility);
       drawing.detachEvents();
       physics.destroy();
+      sound.stopMusic();
     };
   }, []);
+
+  // Auto-start game music immediately when the user enters/starts the game
+  useEffect(() => {
+    const playMusic = () => {
+      if (storage.get('musicEnabled') ?? true) {
+        sound.startMusic();
+      }
+    };
+
+    // Attempt immediate playback
+    playMusic();
+
+    // Unlock Web Audio context on the first user interaction if browser suspended it
+    const handleFirstGesture = () => {
+      sound.ensureContext();
+      playMusic();
+    };
+
+    window.addEventListener('pointerdown', handleFirstGesture, { once: true, passive: true });
+    window.addEventListener('touchstart', handleFirstGesture, { once: true, passive: true });
+    window.addEventListener('keydown', handleFirstGesture, { once: true, passive: true });
+    window.addEventListener('click', handleFirstGesture, { once: true, passive: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', handleFirstGesture);
+      window.removeEventListener('touchstart', handleFirstGesture);
+      window.removeEventListener('keydown', handleFirstGesture);
+      window.removeEventListener('click', handleFirstGesture);
+    };
+  }, []);
+
+  // Sync music playback with paused state
+  useEffect(() => {
+    if (isPaused) {
+      sound.stopMusic();
+    } else if (storage.get('musicEnabled') ?? true) {
+      sound.startMusic();
+    }
+  }, [isPaused]);
 
   // Release ball helper
   const handleReleaseBall = useCallback(() => {
@@ -338,118 +383,178 @@ export default function GameView({ onNavigate, onOpenTutorial }) {
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-4 px-2 sm:px-4 select-none">
-      {/* Level Header Info & Controls (Fully Responsive on Mobile) */}
-      <div className="w-full max-w-4xl bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 sm:px-4 sm:py-2.5 mb-2.5 shadow-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
-        {/* Left: Level Badge & Title */}
-        <div className="flex items-center justify-between sm:justify-start gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <button
-              onClick={() => {
-                sound.playClick();
-                setShowLevelSelect(true);
-              }}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-xs font-bold text-slate-200 transition border border-slate-700 shrink-0"
-            >
-              <Grid className="w-4 h-4 text-emerald-400" />
-              <span>LVL {currentLevel.id}</span>
-            </button>
+      {/* Level Header Info & Controls (Fully Responsive on Mobile & Desktop) */}
+      <div className="w-full max-w-4xl bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 sm:px-4 sm:py-3 mb-2.5 shadow-lg flex flex-col gap-2 sm:gap-2.5">
+        {/* Row 1: Level Badge & Action Controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          {/* Left: Level Badge & Title */}
+          <div className="flex items-center justify-between sm:justify-start gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setShowLevelSelect(true);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-xs font-bold text-slate-200 transition border border-slate-700 shrink-0"
+              >
+                <Grid className="w-4 h-4 text-emerald-400" />
+                <span>LVL {currentLevel.id}</span>
+              </button>
 
-            <div className="min-w-0">
-              <h2 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-1.5 font-heading truncate">
-                <span className="truncate">{currentLevel.title}</span>
-                {currentLevel.isDaily && (
-                  <span className="text-[9px] bg-orange-500/20 text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full font-sans shrink-0">
-                    DAILY
-                  </span>
-                )}
-              </h2>
-              <div className="text-[10px] text-slate-400 font-medium hidden md:block">
-                {currentLevel.worldName} &bull; 3-Star Target: {currentLevel.threeStarInk} px ink
+              <div className="min-w-0">
+                <h2 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-1.5 font-heading truncate">
+                  <span className="truncate">{currentLevel.title}</span>
+                  {currentLevel.isDaily && (
+                    <span className="text-[9px] bg-orange-500/20 text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full font-sans shrink-0">
+                      DAILY
+                    </span>
+                  )}
+                </h2>
+                <div className="text-[10px] text-slate-400 font-medium hidden md:block">
+                  {currentLevel.worldName} &bull; 3-Star Target: {currentLevel.threeStarInk} px ink
+                </div>
               </div>
             </div>
+
+            {/* Release Ball button on mobile header row if not released */}
+            {!isBallReleased && (
+              <button
+                onClick={handleReleaseBall}
+                className="sm:hidden flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/30 active:scale-95 transition shrink-0"
+                title="Release Ball"
+              >
+                <Play className="w-3.5 h-3.5 fill-slate-950" />
+                <span>Roll 🚀</span>
+              </button>
+            )}
           </div>
 
-          {/* Release Ball button on mobile header row if not released */}
-          {!isBallReleased && (
+          {/* Right: Action Toolbar */}
+          <div className="flex items-center justify-end gap-1 sm:gap-1.5">
+            {/* Release Ball button on desktop */}
+            {!isBallReleased && (
+              <button
+                onClick={handleReleaseBall}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/30 transition transform hover:scale-105 active:scale-95 animate-pulse mr-1"
+                title="Release Ball (Space)"
+              >
+                <Play className="w-3.5 h-3.5 fill-slate-950" />
+                <span>Release Ball 🚀</span>
+              </button>
+            )}
+
+            {/* Tutorial Video Quick Button */}
             <button
-              onClick={handleReleaseBall}
-              className="sm:hidden flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/30 active:scale-95 transition shrink-0"
-              title="Release Ball"
+              onClick={() => {
+                if (onOpenTutorial) {
+                  if (!isPaused) setIsPaused(true);
+                  onOpenTutorial();
+                }
+              }}
+              className="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition flex items-center gap-1 active:scale-95"
+              title="Watch 15s Tutorial Video"
             >
-              <Play className="w-3.5 h-3.5 fill-slate-950" />
-              <span>Roll 🚀</span>
+              <Sparkles className="w-4 h-4 text-cyan-400" />
+              <span className="text-[11px] font-bold hidden md:inline">Tutorial</span>
             </button>
-          )}
+
+            {/* Hint Toggle */}
+            <button
+              onClick={() => setHintVisible(prev => !prev)}
+              className={`p-2 rounded-xl transition active:scale-95 ${
+                hintVisible ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400 hover:text-white'
+              }`}
+              title="Level Hint"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </button>
+
+            {/* Restart Button */}
+            <button
+              onClick={handleRestart}
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition active:scale-95"
+              title="Restart Level (R)"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+
+            {/* Pause Button */}
+            <button
+              onClick={() => setIsPaused(prev => !prev)}
+              className={`p-2 rounded-xl transition active:scale-95 ${
+                isPaused ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:text-white'
+              }`}
+              title="Pause Game (Space)"
+            >
+              {isPaused ? <Play className="w-4 h-4 fill-slate-950" /> : <Pause className="w-4 h-4" />}
+            </button>
+
+            {/* Settings Button */}
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition active:scale-95"
+              title="Settings"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Right: Action Toolbar */}
-        <div className="flex items-center justify-end gap-1 sm:gap-1.5">
-          {/* Release Ball button on desktop */}
-          {!isBallReleased && (
-            <button
-              onClick={handleReleaseBall}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/30 transition transform hover:scale-105 active:scale-95 animate-pulse mr-1"
-              title="Release Ball (Space)"
-            >
-              <Play className="w-3.5 h-3.5 fill-slate-950" />
-              <span>Release Ball 🚀</span>
-            </button>
-          )}
+        {/* Row 2: Ink Gauge Strip (Positioned seamlessly outside the canvas to guarantee zero overlap) */}
+        <div className="w-full bg-slate-950/70 border border-slate-800/80 rounded-xl px-2.5 sm:px-3.5 py-1.5 flex items-center justify-between gap-2.5 sm:gap-3.5 shadow-inner">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-xs font-bold text-slate-300">Ink:</span>
+          </div>
 
-          {/* Tutorial Video Quick Button */}
-          <button
-            onClick={() => {
-              if (onOpenTutorial) {
-                if (!isPaused) setIsPaused(true);
-                onOpenTutorial();
-              }
-            }}
-            className="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition flex items-center gap-1 active:scale-95"
-            title="Watch 15s Tutorial Video"
-          >
-            <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-[11px] font-bold hidden md:inline">Tutorial</span>
-          </button>
+          {/* Fluid responsive progress bar */}
+          <div className="relative flex-1 h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-700/80 min-w-0">
+            <div
+              className={`h-full transition-all duration-75 ${
+                inkPercent > 50
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                  : inkPercent > 20
+                  ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
+                  : 'bg-gradient-to-r from-rose-500 to-red-400 animate-pulse'
+              }`}
+              style={{ width: `${inkPercent}%` }}
+            />
 
-          {/* Hint Toggle */}
-          <button
-            onClick={() => setHintVisible(prev => !prev)}
-            className={`p-2 rounded-xl transition active:scale-95 ${
-              hintVisible ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400 hover:text-white'
-            }`}
-            title="Level Hint"
-          >
-            <HelpCircle className="w-4 h-4" />
-          </button>
+            {/* 3-Star Target Indicator Line */}
+            <div
+              className="absolute top-0 bottom-0 w-0.5 bg-amber-300 shadow-sm"
+              style={{ left: `${Math.max(0, Math.min(100, 100 - threeStarPercent))}%` }}
+              title={`3-Star Target: ${currentLevel.threeStarInk} px`}
+            />
+          </div>
 
-          {/* Restart Button */}
-          <button
-            onClick={handleRestart}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition active:scale-95"
-            title="Restart Level (R)"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
+          {/* Remaining ink readout & powerup badges */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-mono font-bold text-slate-200">
+              {Math.round(inkState.remaining)} <span className="text-[10px] text-slate-400">px</span>
+            </span>
 
-          {/* Pause Button */}
-          <button
-            onClick={() => setIsPaused(prev => !prev)}
-            className={`p-2 rounded-xl transition active:scale-95 ${
-              isPaused ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-            title="Pause Game (Space)"
-          >
-            {isPaused ? <Play className="w-4 h-4 fill-slate-950" /> : <Pause className="w-4 h-4" />}
-          </button>
-
-          {/* Settings Button */}
-          <button
-            onClick={() => setShowSettings(true)}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition active:scale-95"
-            title="Settings"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
+            {/* Active Powerup Badges */}
+            {(activeEffects.shield || activeEffects.slowMo || activeEffects.freeze) && (
+              <div className="flex items-center gap-1">
+                {activeEffects.shield && (
+                  <span className="bg-blue-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full animate-pulse" title="Shield Active">
+                    🛡️
+                  </span>
+                )}
+                {activeEffects.slowMo && (
+                  <span className="bg-purple-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full animate-pulse" title="Slow-Mo Active">
+                    ⏳
+                  </span>
+                )}
+                {activeEffects.freeze && (
+                  <span className="bg-cyan-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full animate-pulse" title="Freeze Active">
+                    ❄️
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -490,60 +595,6 @@ export default function GameView({ onNavigate, onOpenTutorial }) {
             </button>
           </div>
         )}
-
-        {/* Ink Gauge Overlay on Canvas Top */}
-        <div className="absolute top-3 left-4 right-4 pointer-events-none flex items-center justify-between">
-          <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700/80 px-3.5 py-1.5 rounded-2xl flex items-center gap-3 shadow-lg">
-            <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-              <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Ink:</span>
-            </span>
-
-            {/* Ink Progress Bar */}
-            <div className="relative w-28 sm:w-44 h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-700">
-              <div
-                className={`h-full transition-all duration-75 ${
-                  inkPercent > 50
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
-                    : inkPercent > 20
-                    ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
-                    : 'bg-gradient-to-r from-rose-500 to-red-400 animate-pulse'
-                }`}
-                style={{ width: `${inkPercent}%` }}
-              />
-
-              {/* 3-Star Marker Indicator */}
-              <div
-                className="absolute top-0 bottom-0 w-0.5 bg-amber-300 shadow-md"
-                style={{ left: `${100 - threeStarPercent}%` }}
-                title="3-Star Ink Limit"
-              />
-            </div>
-
-            <span className="text-xs font-mono font-bold text-slate-300">
-              {Math.round(inkState.remaining)} px
-            </span>
-          </div>
-
-          {/* Active Powerup Badges */}
-          <div className="flex gap-1.5">
-            {activeEffects.shield && (
-              <span className="bg-blue-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
-                🛡️ Shield Active
-              </span>
-            )}
-            {activeEffects.slowMo && (
-              <span className="bg-purple-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
-                ⏳ Slow-Mo Active
-              </span>
-            )}
-            {activeEffects.freeze && (
-              <span className="bg-cyan-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
-                ❄️ Hazards Frozen
-              </span>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* In-Game Power-Ups Bar */}
